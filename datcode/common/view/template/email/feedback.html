@@ -1,0 +1,6 @@
+{% set feedback = globals().get('feedback') %}
+{% set username = globals().get('username') %}
+{% set category = globals().get('category') %}
+<h1>New Feedback!</h1>
+<p>{{ username }} has a suggestion for {{ category }}</p>
+<p>{{ feedback }}</p>
