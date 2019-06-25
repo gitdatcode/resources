@@ -59,7 +59,7 @@ class UserMapper(BaseNodeMapper, HasOwnership):
 
         data = super().data(entity)
 
-        if 'username' in data and self.ensure_privacy and entity['private']:
+        if 'username' in data and (self.ensure_privacy or entity['private']):
             data['username'] = 'SOME PRIVATE USER'
 
         if 'password' in data:

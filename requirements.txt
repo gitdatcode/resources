@@ -7,7 +7,7 @@ flake8==3.7.7
 isort==4.3.20
 lazy-object-proxy==1.4.1
 mccabe==0.6.1
--e git+https://github.com/emehrkay/moesha.git@b9fc5cf55b5057b4b166c6de9110e207892273cb#egg=moesha
+-e git+https://github.com/emehrkay/moesha.git@51b48979f825ce4b8328dc7f692e776710556b55#egg=moesha
 neo4j==1.7.4
 neobolt==1.7.13
 neotime==1.7.4
@@ -18,7 +18,7 @@ pycparser==2.19
 pyflakes==2.1.1
 Pygments==2.4.2
 pylint==2.3.1
-python-cypher==0.16.2
+python-cypher==0.16.4
 python-dateutil==2.8.0
 pytz==2019.1
 six==1.12.0

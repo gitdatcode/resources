@@ -75,7 +75,7 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
 
         # filter the resource title and descripiton by search string powersets
         for contains in search['search']['contains']:
-            term = "'.*{}.*'".format(contains)
+            term = ".*{}.*".format(contains)
             d = Pypher()
             t = Pypher()
             d.resource.__description__.re(term)
