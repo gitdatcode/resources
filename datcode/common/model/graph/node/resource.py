@@ -51,7 +51,12 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         WHERE (user.username = 'mark) AND (tag.tag_normalized = 'code') and (resource.title =~ '.*python.*' OR resource.description =~ '.*python.*')
         return DISTINCT(resource), COLLECT(DISTINCT(user)), COLLECT(DISTINCT(tag))
         """
+        from datcode.common.model.graph.node import User
+
+
         search = parse_search_string(search_string)
+        user_mapper = self.get_mapper(User)
+        user_mapper.ensure_privacy = ensure_privacy
 
         p = Pypher()
         p.node('resource', labels='Resource')
@@ -115,19 +120,16 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         total_res = self.mapper.query(pypher=total)
 
         try:
-            total_results = total_res.first()['total']
+            total_results = total_res.first()['result']
         except:
             total_results = 0
 
-        query.RETURN('DISTINCT(resource)', 'COLLECT(DISTINCT(user)) AS user', 'COLLECT(tag) as tags')
+        query.RETURN('DISTINCT(resource)', 'user', 'COLLECT(tag) as tags')
         query.SKIP(skip).LIMIT(limit)
         results = self.mapper.query(pypher=query)
-        import pudb; pu.db
-        # fix the results
-
 
         return {
             'total': total_results,
-            'results': results,
+            'results': results.entity_data,
         }
  

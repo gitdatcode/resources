@@ -1,5 +1,6 @@
 from . import BaseNode, BaseNodeMapper
 
+from moesha.entity import Collection
 from moesha.property import (String, Integer, Float, Boolean, TimeStamp,
     DateTime, RelatedEntity)
 
@@ -27,6 +28,9 @@ class UserMapper(BaseNodeMapper, HasOwnership):
     from datcode.common.model.graph.relationship import (AddedResource,
         RequestedPasswordReset)
 
+    # Flag for user models that says to mask the username
+    ensure_privacy = True
+
     entity = User
     __PROPERTIES__ = {
         'username': String(),
@@ -35,6 +39,7 @@ class UserMapper(BaseNodeMapper, HasOwnership):
         'slack_id': String(),
         'email_address': String(),
         'verified': Boolean(default=False),
+        'private': Boolean(default=True),
         'first_name': String(),
         'last_name': String(),
         'middle_name': String(),
@@ -47,6 +52,20 @@ class UserMapper(BaseNodeMapper, HasOwnership):
         'Resources': RelatedEntity(relationship_entity=AddedResource,
             ensure_unique=True),
     }
+
+    def data(self, entity):
+        if isinstance(entity, Collection):
+            return [self.data(e) for e in entity]
+
+        data = super().data(entity)
+
+        if 'username' in data and self.ensure_privacy and entity['private']:
+            data['username'] = 'SOME PRIVATE USER'
+
+        if 'password' in data:
+            del data['password']
+
+        return data
 
     def update_password(self, user, password, password_check):
         if password != password_check:

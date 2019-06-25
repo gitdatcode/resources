@@ -29,7 +29,6 @@ class TagMapper(BaseNodeMapper):
             }
             tag = self.create(properties=props)
             work = self.save(tag, work=work)
-
         return work.send()
 
     def get_tags_by_tags(self, *tags):
