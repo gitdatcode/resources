@@ -105,3 +105,6 @@ venv.bak/
 .DS_Store
 .vscode
 
+# settings
+*environment
+datcode/configs/production*
