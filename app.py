@@ -27,10 +27,12 @@ os.environ['datcode_environment'] = 'testing'
 import inspect
 import sys
 
-from datcode.commands import add_resource, search_resources, update_user
+from datcode.commands import (add_resource, search_resources, update_user,
+    start_server)
 
 
 COMMANDS = {
+    'start_server': start_server,
     'add_resource': add_resource,
     'search_resources': search_resources,
     'update_user': update_user,

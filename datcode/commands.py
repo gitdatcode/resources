@@ -1,8 +1,35 @@
 """this file holds all of the commands that will help create a cli interface
 into the datcode api"""
 
+
+def start_server(*args, **kwargs):
+    """This method is used to run the server
+
+    example:
+        start_server
+    """
+    from tornado import httpserver, ioloop
+
+    from datcode.bootstrap import create_application
+    from datcode.config import options
+
+
+    try:
+        for port in options.ports:
+            application = create_application()
+            http_server = httpserver.HTTPServer(application)
+
+            print('API STARTED ON PORT: ', port)
+
+            http_server.listen(port)
+
+        ioloop.IOLoop.current().start()
+    except Exception as e:
+        print(e)
+
+
 def add_resource(title, description, uri, tags, date_created, username,
-                 slack_id):
+                 slack_id, print_resource=True):
     """method that will allow dobot to add resources directly to the database
 
     example:
@@ -34,7 +61,12 @@ def add_resource(title, description, uri, tags, date_created, username,
         # check that the current user is the owner
         # if not return an error
         if not resource_mapper.is_owner(user, resource):
-            print('resource already exists')
+            message = 'resource already exists'
+
+            if print_resource:
+                print(message)
+            else:
+                raise Exception
             udpate_resource = False
             return
     except:
@@ -59,6 +91,12 @@ def add_resource(title, description, uri, tags, date_created, username,
     work = resource_mapper(resource)['Tags'].replace(tags, work=work)
 
     work.send()
+
+    if print_resource:
+        print(resource_mapper.data(resource))
+        return
+
+    return resource
 
 
 def search_resources(search_string):

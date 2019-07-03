@@ -8,6 +8,7 @@ from . import BaseNode, BaseNodeMapper
 from ..relationship import HasTag
 from datcode.common.model.graph.mixin import HasOwnership
 from datcode.common.utils import parse_search_string, normalize
+from datcode.config import options
 
 
 class Resource(BaseNode):
@@ -42,7 +43,7 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         return resource.first()
 
     def get_by_search_string(self, search_string, ensure_privacy=True,
-                             limit=20, skip=0):
+                             limit=options.pagination, skip=0):
         """based on a search string of:
             pyhon #code @mark
         build a query with the foundation of:

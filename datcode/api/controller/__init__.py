@@ -12,13 +12,18 @@ from datcode.common.model.acl import Roles
 
 
 class BaseAPIController(BaseController):
-    
+    request_entity = None
+    request_mapper = None
+
     def prepare(self):
         if options.debug:
             self._start_time = timer()
 
         self.user = None
         self.user_mapper = self.mapper.get_mapper(User)
+
+        if self.request_entity:
+            self.request_mapper = self.mapper.get_mapper(self.request_entity)
 
     def __init__(self, application, request, **kwargs):
         super().__init__(application=application, request=request, **kwargs)
