@@ -1,4 +1,5 @@
 import os
+import sys
 
 from tornado.options import (options, define, parse_config_file,
     parse_command_line)
@@ -67,4 +68,12 @@ if os.path.isfile(local_override):
 
 
 # load the cli flags to override pre-defined config settings
-parse_command_line()
+# remove app.py if it is the first arg. This is done because starting the sever
+# by running python app.py start_server --arg=value is not parsable by
+# tornado's parse_command_line function
+args = sys.argv[:]
+
+if args[0] == 'app.py':
+    args = args[1:]
+
+parse_command_line(args=args)
