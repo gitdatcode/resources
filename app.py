@@ -21,7 +21,7 @@
 import os
 
 # use the testing database
-os.environ['datcode_environment'] = 'testing'
+# os.environ['datcode_environment'] = 'testing'
 # END REMOVE
 
 import inspect
