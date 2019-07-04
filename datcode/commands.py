@@ -96,7 +96,14 @@ def add_resource(title, description, uri, tags, date_created, username,
         print(resource_mapper.data(resource))
         return
 
-    return resource
+    return {
+        'resource': resource_mapper.data(resource),
+        'user': {
+            'username': user['username'],
+            'slack_id': user['slack_id'],
+        },
+        'tags': [tag_mapper.data(t) for t in tags],
+    }
 
 
 def search_resources(search_string):

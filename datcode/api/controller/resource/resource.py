@@ -42,4 +42,4 @@ class InternalSlackResourceController(ResourceController):
         except Exception as e:
             pass
 
-        return self.json(data=self.request_mapper.data(resource))
+        return self.json(data=resource)
