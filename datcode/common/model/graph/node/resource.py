@@ -73,7 +73,7 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         p3.node('resource').rel_out(labels='HasTag').node('tags', labels='Tag')
 
         query = Pypher()
-        query.MATCH(p, p2)
+        query.MATCH(p, p2, p3)
 
         wheres = []
         search_ors = []
