@@ -64,7 +64,13 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         p.rel_in(labels='AddedResource').node('user', labels='User')
 
         p2 = Pypher()
-        p2.node('resource').rel_out('HasTag').node('tag', labels='Tag')
+        p2.node('resource').rel_out(labels='HasTag').node('tag', labels='Tag')
+
+        p2 = Pypher()
+        p2.node('resource').rel_out(labels='HasTag').node('tag', labels='Tag')
+
+        p3 = Pypher()
+        p3.node('resource').rel_out(labels='HasTag').node('tags', labels='Tag')
 
         query = Pypher()
         query.MATCH(p, p2)
@@ -125,7 +131,7 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         except:
             total_results = 0
 
-        query.RETURN('DISTINCT(resource)', 'user', 'COLLECT(tag) as tags')
+        query.RETURN('DISTINCT(resource)', 'user', 'COLLECT(tags) as tags')
         query.SKIP(skip).LIMIT(limit)
         results = self.mapper.query(pypher=query)
 
