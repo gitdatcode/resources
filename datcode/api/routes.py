@@ -25,5 +25,5 @@ ROUTES = (
     (r'/api/resource/search', ResourceSearchController),
 
     # internal slack api calls
-    # (r'/api/slack/resource', InternalSlackResourceController),
+    (r'/api/slack/resource', InternalSlackResourceController),
 )
