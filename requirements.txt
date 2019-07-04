@@ -7,7 +7,7 @@ flake8==3.7.7
 isort==4.3.20
 lazy-object-proxy==1.4.1
 mccabe==0.6.1
--e git+https://github.com/emehrkay/moesha.git@29c9bc72351b845bfd3d78490545f1772f1feed1#egg=moesha
+-e git+https://github.com/emehrkay/moesha.git@eda7995fbff786a4e3aee9c88dcca74e05eeb1ef#egg=moesha
 neo4j==1.7.4
 neobolt==1.7.13
 neotime==1.7.4
