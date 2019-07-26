@@ -233,8 +233,6 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         else:
             query.WHERE(id_match)
 
-        import pudb; pu.db
-
         # paginate and get a total count
         total = query.clone()
         total.RETURN('COUNT(DISTINCT(resource)) AS total')
