@@ -20,8 +20,10 @@ class ResourceSearchController(ResourceController):
 
         limit = options.pagination
         skip = page * limit
+
+        # @TODO: fix the ensure_privacy flag
         results = self.request_mapper.get_by_search_string(search, skip=skip,
-            limit=limit)
+            limit=limit, ensure_privacy=False)
 
         # convert results to final response pagination
         self.paginate_total = results['total']
