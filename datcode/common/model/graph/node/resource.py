@@ -225,14 +225,15 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
             search_ors.append(d)
             search_ors.append(t)
 
-        wheres.append(__.ID('user_resource') == __.ID('resource'))
+        id_match = __.ID('user_resource') == __.ID('resource')
 
         if search_ors:
-            ors = Pypher()
-            ors.COR(*search_ors)
-            wheres.append(ors)
+            search_ors = __.COR(*search_ors)
+            query.WHERE(__.CAND(id_match, search_ors))
+        else:
+            query.WHERE(id_match)
 
-        query.WHERE(*wheres)
+        import pudb; pu.db
 
         # paginate and get a total count
         total = query.clone()
