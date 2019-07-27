@@ -42,7 +42,7 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
 
         return resource.first()
 
-    def get_by_search_string_old(self, search_string, ensure_privacy=True,
+    def get_by_search_string(self, search_string, ensure_privacy=True,
                              limit=options.pagination, skip=0):
         """based on a search string of:
             pyhon #code @mark
@@ -137,17 +137,33 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         except:
             total_results = 0
 
-        query.RETURN('DISTINCT(resource)', 'user', 'COLLECT(tags) as tags')
+        query.RETURN('DISTINCT(resource)', 'user')
         query.SKIP(skip).LIMIT(limit)
         results = self.mapper.query(pypher=query)
+        result_data = []
+
+        for res in results:
+            tags = self(res['resource'])['Tags']()
+            username = res['user']['username']
+
+            if ensure_privacy:
+                username = 'DATCODE-USER'
+
+            result_data.append({
+                'resource': self.data(res['resource']),
+                'user': {
+                    'username': username,
+                },
+                'tags': self.data(tags),
+            })
 
         return {
             'total': total_results,
-            'results': results.entity_data,
+            'results': result_data,
         }
  
 
-    def get_by_search_string(self, search_string, ensure_privacy=True,
+    def get_by_search_stringXXX(self, search_string, ensure_privacy=True,
                              limit=options.pagination, skip=0):
         """based on a search string of:
             pyhon #code @mark
