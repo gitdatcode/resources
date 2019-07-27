@@ -141,36 +141,36 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         query.SKIP(skip).LIMIT(limit)
         results = self.mapper.query(pypher=query)
         result_data = []
+        import pudb; pu.db
 
-        if total_results > 1:
-            for res in results:
-                tags = self(res['resource'])['Tags']()
-                username = res['user']['username']
-
-                if ensure_privacy:
-                    username = 'DATCODE-USER'
-
-                result_data.append({
-                    'resource': self.data(res['resource']),
-                    'user': {
-                        'username': username,
-                    },
-                    'tags': self.data(tags),
-                })
-        else:
-            tags = self(results[0])['Tags']()
-            username = results[1]['username']
+        for res in results:
+            tags = self(res['resource'])['Tags']()
+            username = res['user']['username']
 
             if ensure_privacy:
                 username = 'DATCODE-USER'
 
             result_data.append({
-                'resource': self.data(results[0]),
+                'resource': self.data(res['resource']),
                 'user': {
                     'username': username,
                 },
                 'tags': self.data(tags),
             })
+        # else:
+        #     tags = self(results[0])['Tags']()
+        #     username = results[1]['username']
+
+        #     if ensure_privacy:
+        #         username = 'DATCODE-USER'
+
+        #     result_data.append({
+        #         'resource': self.data(results[0]),
+        #         'user': {
+        #             'username': username,
+        #         },
+        #         'tags': self.data(tags),
+        #     })
 
         return {
             'total': total_results,
