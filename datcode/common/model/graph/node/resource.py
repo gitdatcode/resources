@@ -142,15 +142,30 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         results = self.mapper.query(pypher=query)
         result_data = []
 
-        for res in results:
-            tags = self(res['resource'])['Tags']()
-            username = res['user']['username']
+        if total_results > 1:
+            for res in results:
+                tags = self(res['resource'])['Tags']()
+                username = res['user']['username']
+
+                if ensure_privacy:
+                    username = 'DATCODE-USER'
+
+                result_data.append({
+                    'resource': self.data(res['resource']),
+                    'user': {
+                        'username': username,
+                    },
+                    'tags': self.data(tags),
+                })
+        else:
+            tags = self(results[0])['Tags']()
+            username = results[1]['username']
 
             if ensure_privacy:
                 username = 'DATCODE-USER'
 
             result_data.append({
-                'resource': self.data(res['resource']),
+                'resource': self.data(results[0]),
                 'user': {
                     'username': username,
                 },
@@ -185,7 +200,7 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         search = parse_search_string(search_string)
         user_mapper = self.get_mapper(User)
         user_mapper.ensure_privacy = ensure_privacy
-
+        import pudb; pu.db
         # build the tag portion of the search query
         tag_ors = []
         tag_q = Pypher()
