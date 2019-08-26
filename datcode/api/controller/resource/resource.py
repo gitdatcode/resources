@@ -15,6 +15,8 @@ class ResourceSearchController(ResourceController):
         search = self.get_argument('search', '')
         page = int(self.get_argument('page', 0))
 
+        # import pudb; pu.db
+        self.paginate_page = page
         if page > 1:
             page = max(page - 1, 0)
 
@@ -27,8 +29,9 @@ class ResourceSearchController(ResourceController):
 
         # convert results to final response pagination
         self.paginate_total = results['total']
+        data = results['results']
 
-        return self.json(data=results['results'])
+        return self.json(data=data)
 
 
 class InternalSlackResourceController(ResourceController):
