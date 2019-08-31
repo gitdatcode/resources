@@ -141,6 +141,8 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
         query.SKIP(skip).LIMIT(limit)
         results = self.mapper.query(pypher=query)
         result_data = []
+        all_tags = []
+        all_tag_ids = []
 
         for res in results:
             tags = self(res['resource'])['Tags']()
@@ -157,8 +159,14 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
                 'tags': self.data(tags),
             })
 
+            for tag in tags:
+                if tag.id not in all_tag_ids:
+                    all_tags.append(tag.data)
+                    all_tag_ids.append(tag.id)
+
         return {
             'total': total_results,
             'results': result_data,
+            'all_tags': all_tags,
         }
  

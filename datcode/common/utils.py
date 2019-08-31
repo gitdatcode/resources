@@ -16,8 +16,10 @@ def normalize(string):
     return string
 
 
-def powerset(s):
+def powerset(s, limit=8):
     x = len(s)
+    if x >= limit:
+        x = limit
     masks = [1 << i for i in range(x)]
 
     for i in range(1 << x):

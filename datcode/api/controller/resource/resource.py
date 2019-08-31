@@ -1,3 +1,5 @@
+import uuid
+
 from datcode.bootstrap import options
 from datcode.api.controller import BaseAPIController
 from datcode.common.model.graph.node.resource import Resource
@@ -29,7 +31,11 @@ class ResourceSearchController(ResourceController):
 
         # convert results to final response pagination
         self.paginate_total = results['total']
-        data = results['results']
+        data = {
+            'id': str(uuid.uuid4()),
+            'resources': results['results'],
+            'all_tags': results['all_tags'],
+        }
 
         return self.json(data=data)
 
