@@ -138,7 +138,7 @@ class ResourceMapper(BaseNodeMapper, HasOwnership):
             total_results = 0
 
         query.RETURN('DISTINCT(resource)', 'user')
-        query.ORDERBY('resource.date_created', 'DESC')
+        query.ORDERBY('resource.date_created', __.DESC)
         query.SKIP(skip).LIMIT(limit)
         results = self.mapper.query(pypher=query)
         result_data = []
