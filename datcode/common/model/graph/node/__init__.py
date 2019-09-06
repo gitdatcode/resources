@@ -13,7 +13,7 @@ class BaseNode(Node):
 
 class BaseNodeMapper(BaseMapper, StructuredNodeMapper):
     __PROPERTIES__ = {
-        'date_created': TimeStamp(),
+        'date_created': DateTime(datetime.now),
         'date_updated': DateTime(datetime.now),
     }
 
