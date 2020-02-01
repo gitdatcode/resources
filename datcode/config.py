@@ -55,8 +55,8 @@ define('feedback_email', ['emehrkay@gmail.com',], multiple=True)
 
 # Email AWS SES
 define('from_email', 'mark@invee.io')
-define('aws_access_key_id', 'AKIAIUYJFJVQQ5FRFHPA')
-define('aws_secret_access_key', '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')
+define('aws_access_key_id', '')
+define('aws_secret_access_key', '')
 define('aws_region', 'us-east-1')
 
 
