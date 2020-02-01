@@ -28,8 +28,8 @@ def powerset(s, limit=8):
 
 def parse_search_string(search):
     """function used to create a cheap-o search engine in sql(ite)"""
-    user_re = r'(\@[\w\d-]+)'
-    tag_re = r'(\#[\w\d-]+)'
+    user_re = r'(\@[\w\d\-\.]+)'
+    tag_re = r'(\#[\w\d\-\.]+)'
 
     # get the list of users and tags
     users = re.findall(user_re, search, flags=re.IGNORECASE)
