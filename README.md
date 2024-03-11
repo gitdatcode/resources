@@ -1,44 +1,41 @@
-# DATCODEdotCOM
+# DatResources
 
-This will be the repo for the DATCODE public website.
+DATCODE's esource management system.
 
-## Development Requirements
+## Requirements
 
-* Python3
-* Neo4j
+* Go 1.22.x
+* Either a copy of the resources.csv or resources.db (sqlite file)
 
-### Installation
+### Build the executable
 
-* Create a virutal environment
-
-```
-python3 -m venv env
-```
-
-* Install the dependencies
+While in the project directory, run
 
 ```
-pip install -r requirements.txt
+go build -o resources cmd/main.go
 ```
 
-### Run Tests
+### Running the program
 
-* Ensure that you have Neo4j installed with a database that has the password `datcoe_testing`
-    * Run that database
-* start the virutal environment
+The resources executable is a CLI app that can spawn a webserver. 
 
-```
-source env/bin/active
-```
+#### Availabe CLI commands:
 
-* Run all of the tests
+| Command  | | Input |
+| -------- | - | - |
+| `./resources load` | Loads the Neo4j csv backup to the db. This onlhy needs to be done if the db hasnt already been created | `--csv /path/to/backup.csv` |
+| `./resources add` | Adds a new resource to the db | `--title "some title"` `--description "resource description"` -`-user` `--slack_id` `--uri` |
+| `./resources search` | Executes a search against the db | `--query "some search query @user @user #tag"` |
+| `./resources web` | Starts the webserver | `--port=":9999"` |
 
-```
-python -m unittest discover datcode.test.api
-```
+#### Webserver Routes
 
-* Target a specific test case
+| Method | URI | Params | Description |
+| - |  - |  - |  - | 
+| `GET` | `/search` | `query=some query string (same as cli)` `limit` `offset` `powerset_cap=5 (the number of items to turn into a powerset in lue of full text searching)` | Does a search against the db |
+| `POST` | `/resource` | `{"user": {"username": "mark", "slack_id": "XXXX"}, "resource": {"description": "test"}, "tags": ["one", "two", "three"]}` | Creates a new resource and will create a new user if necessary |
 
-```
- python -m unittest datcode.test.api.controller.auth.test_login
-```
+## TO-DO
+
+- [ ] Add functionality to manage users directly
+- [ ] Add full text searching and drop the powerset term like matching
