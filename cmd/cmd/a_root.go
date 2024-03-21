@@ -12,15 +12,20 @@ import (
 
 	"github.com/gitdatcode/resources/internal/env"
 	"github.com/gitdatcode/resources/internal/service"
+
+	// pull in any work registrations
+	_ "github.com/gitdatcode/resources/work/resources"
 )
 
 var (
 	serviceLayer *service.Resources
+	slackToken   string
 )
 
 func init() {
 	var err error
 
+	slackToken = env.Get("SLACK_TOKEN", "local")
 	path := env.Get("DB_LOCATION", "./resources.db")
 	path = "file:" + path + "?_foreign_keys=true"
 	db, err := sql.Open("sqlite3", path)

@@ -15,7 +15,7 @@ func init() {
 		Use:   "web",
 		Short: "starts the web server",
 		Run: func(cmd *cobra.Command, args []string) {
-			web := web.New(serviceLayer, port)
+			web := web.New(serviceLayer, port, slackToken)
 			web.Start()
 		},
 	}

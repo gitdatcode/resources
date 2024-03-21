@@ -7,36 +7,38 @@ import (
 	"net/http"
 
 	"github.com/gitdatcode/resources/internal/service"
-	"github.com/gitdatcode/resources/pkg/requests"
+	"github.com/gitdatcode/resources/internal/web/middleware"
 )
 
 var (
 	ErrPostBodyRequired = errors.New("request body required")
 )
 
-func New(serviceLayer *service.Resources, port string) *Web {
+func New(serviceLayer *service.Resources, port, slackToken string) *Server {
 
 	mux := http.NewServeMux()
-	web := &Web{
+	server := &Server{
 		Router:       mux,
 		ServiceLayer: serviceLayer,
 		port:         port,
+		slackToken:   slackToken,
 	}
 
-	web.DefineRoutes()
+	server.DefineRoutes()
 
-	return web
+	return server
 }
 
-type Web struct {
+type Server struct {
 	Router       *http.ServeMux
 	ServiceLayer *service.Resources
 	port         string
+	slackToken   string
 }
 
-func (web *Web) Start() error {
-	log.Printf(`web started %v`, web.port)
-	err := http.ListenAndServe(web.port, web.Router)
+func (server *Server) Start() error {
+	log.Printf(`web started %v`, server.port)
+	err := http.ListenAndServe(server.port, server.Router)
 	if err != nil {
 		return err
 	}
@@ -44,66 +46,35 @@ func (web *Web) Start() error {
 	return nil
 }
 
-func (web *Web) DefineRoutes() {
-	web.Router.HandleFunc("GET /search", web.search)
-	web.Router.HandleFunc("POST /resource", web.addResource)
+func (server *Server) DefineRoutes() {
+	server.Router.HandleFunc("GET /search", server.resourceSearch)
+	server.Router.HandleFunc("POST /resource", server.resourceAdd)
+	server.Router.HandleFunc("POST /do.bot/command/{command}", middleware.Chain(
+		server.doBotCommnad,
+		middleware.ValidSlackRequest(server.slackToken),
+	))
+	server.Router.HandleFunc("POST /do.bot/action", middleware.Chain(
+		server.doBotAction,
+		middleware.ValidSlackRequest(server.slackToken),
+	))
 }
 
-func (web *Web) RespondJson(content any, status int, w http.ResponseWriter) {
+func (server *Server) RespondJson(content any, status int, w http.ResponseWriter) {
 	resp, err := json.Marshal(content)
 	if err != nil {
-		web.HandleError(w, err, "unable to handle json conversion")
+		server.HandleError(w, err, "unable to handle json conversion")
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 	if _, err = w.Write(resp); err != nil {
-		web.HandleError(w, err, "unable to write response")
+		server.HandleError(w, err, "unable to write response")
 		return
 	}
 }
 
-func (web *Web) HandleError(w http.ResponseWriter, err error, message string) {
+func (server *Server) HandleError(w http.ResponseWriter, err error, message string) {
 	log.Printf(`error during http call -- %v`, err)
 
-}
-
-func (web *Web) search(w http.ResponseWriter, r *http.Request) {
-	req, err := requests.NewSearchResourcesFromURL(r.URL)
-	if err != nil {
-		web.HandleError(w, err, "unable to create new search")
-		return
-	}
-
-	res, err := web.ServiceLayer.ResourceSearch(*req)
-	if err != nil {
-		web.HandleError(w, err, "unable to create execute search")
-		return
-	}
-
-	web.RespondJson(res, http.StatusOK, w)
-}
-
-func (web *Web) addResource(w http.ResponseWriter, r *http.Request) {
-	if r.Body == nil {
-		web.HandleError(w, ErrPostBodyRequired, "post body requied")
-		return
-	}
-
-	decoder := json.NewDecoder(r.Body)
-	req := requests.CreateResource{}
-	err := decoder.Decode(&req)
-	if err != nil {
-		web.HandleError(w, err, "cannot create post body")
-		return
-	}
-
-	res, err := web.ServiceLayer.ResourceAdd(req)
-	if err != nil {
-		web.HandleError(w, err, "unable to create resource")
-		return
-	}
-
-	web.RespondJson(res, http.StatusOK, w)
 }
