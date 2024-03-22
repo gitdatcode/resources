@@ -14,7 +14,7 @@ import (
 	"github.com/gitdatcode/resources/internal/service"
 
 	// pull in any work registrations
-	_ "github.com/gitdatcode/resources/work/resources"
+	reg "github.com/gitdatcode/resources/work/resources"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 func init() {
 	var err error
 
-	slackToken = env.Get("SLACK_TOKEN", "local")
+	slackToken = env.Get("SLACK_TOKEN", "")
 	path := env.Get("DB_LOCATION", "./resources.db")
 	path = "file:" + path + "?_foreign_keys=true"
 	db, err := sql.Open("sqlite3", path)
@@ -52,6 +52,8 @@ func init() {
 	if err != nil {
 		log.Fatalf(`unable to create service layer -- %v`, err)
 	}
+
+	reg.New(serviceLayer)
 }
 
 func jsonPrettyPrint(in []byte) string {

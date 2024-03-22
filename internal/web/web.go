@@ -49,7 +49,7 @@ func (server *Server) Start() error {
 func (server *Server) DefineRoutes() {
 	server.Router.HandleFunc("GET /search", server.resourceSearch)
 	server.Router.HandleFunc("POST /resource", server.resourceAdd)
-	server.Router.HandleFunc("POST /do.bot/command/{command}", middleware.Chain(
+	server.Router.HandleFunc("POST /do.bot/command", middleware.Chain(
 		server.doBotCommnad,
 		middleware.ValidSlackRequest(server.slackToken),
 	))

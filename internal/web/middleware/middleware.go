@@ -2,6 +2,7 @@ package middleware
 
 import "net/http"
 
+type MiddlwareContextKey string
 type Middleware func(next http.HandlerFunc) http.HandlerFunc
 
 func Chain(handler http.HandlerFunc, middlewares ...Middleware) http.HandlerFunc {

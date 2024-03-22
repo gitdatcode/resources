@@ -7,10 +7,10 @@ type Workable interface {
 
 type Commandable interface {
 	Workable
-	Command(resp ResponseWriter, args ...string) error
+	Command(resp ResponseWriter, slashCommand SlashCommand) error
 }
 
 type Actionable interface {
 	Workable
-	Action(resp ResponseWriter, args ...string) error
+	Action(resp ResponseWriter, dialogSubmission DialogSubmission[GenericReponse]) error
 }
