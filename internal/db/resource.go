@@ -49,8 +49,11 @@ func (m *Manager) ResourceSearch(tx *sql.Tx, limit, offset int, searchStrings, u
 		var tagClauses []string
 
 		for _, tag := range tags {
-			tagClauses = append(tagClauses, `(tag.properties->>'tag' = ? OR tag.properties->>'tag_normalized' = ?)`)
-			params = append(params, tag, tag)
+			tagClauses = append(tagClauses, `INSTR(tags, ?) > 0`)
+
+			// we want to match the full tag, include quotes
+			tag = fmt.Sprintf(`"%s"`, tag)
+			params = append(params, tag)
 		}
 
 		tagHaving = fmt.Sprintf(`HAVING (%s)`, strings.Join(tagClauses, " OR "))
@@ -110,6 +113,7 @@ func (m *Manager) ResourceSearch(tx *sql.Tx, limit, offset int, searchStrings, u
 	var total int
 	totalQuery := fmt.Sprintf(`
 	SELECT
+		IFNULL(GROUP_CONCAT(tag.properties, '|||'), '') tags,
 		count(resource.id) OVER() AS TotalRecords
 	FROM
 		node resource
@@ -133,7 +137,8 @@ func (m *Manager) ResourceSearch(tx *sql.Tx, limit, offset int, searchStrings, u
 		fmt.Printf("\n\n******\ntotal query:\n%s\n\nparams:\n%+v", totalQuery, params)
 	}
 
-	err = tx.QueryRow(totalQuery, params...).Scan(&total)
+	var countTags string
+	err = tx.QueryRow(totalQuery, params...).Scan(&countTags, &total)
 	if err != nil && err != sql.ErrNoRows {
 		return 0, nil, err
 	}

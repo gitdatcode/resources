@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -23,6 +25,39 @@ type SlashCommand struct {
 	ResponseURL         string `json:"response_url"`
 	TriggerID           string `json:"trigger_id"`
 	APIAppID            string `json:"api_app_id"`
+}
+
+func jsonPrettyPrint(in []byte) string {
+	var out bytes.Buffer
+	err := json.Indent(&out, in, "", "\t")
+	if err != nil {
+		return string(in)
+	}
+
+	return out.String()
+}
+
+func RespondJson(content any, url string) error {
+	by, err := json.Marshal(content)
+	if err != nil {
+		return err
+	}
+	fmt.Println(">>>>>>>>\n\n\n", jsonPrettyPrint(by), "\n\n\n>>>>>>>>\n\n\n*")
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(by))
+	if err != nil {
+		fmt.Println(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer resp.Body.Close()
+	b, e := io.ReadAll(resp.Body)
+	fmt.Println(string(b), e)
+	return nil
 }
 
 // SlashCommandParse will parse the request of the slash command
