@@ -25,6 +25,7 @@ type SlashCommand struct {
 	ResponseURL         string `json:"response_url"`
 	TriggerID           string `json:"trigger_id"`
 	APIAppID            string `json:"api_app_id"`
+	APPTOKENID          string `json:"-"`
 }
 
 func jsonPrettyPrint(in []byte) string {
@@ -37,7 +38,7 @@ func jsonPrettyPrint(in []byte) string {
 	return out.String()
 }
 
-func RespondJson(content any, url string) error {
+func RespondJson(content any, url string, headers map[string]string) error {
 	by, err := json.Marshal(content)
 	if err != nil {
 		return err
@@ -48,6 +49,11 @@ func RespondJson(content any, url string) error {
 		fmt.Println(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -58,6 +64,14 @@ func RespondJson(content any, url string) error {
 	b, e := io.ReadAll(resp.Body)
 	fmt.Println(string(b), e)
 	return nil
+}
+
+func RespondChannelJson(content any, url string, auth string) error {
+	headers := map[string]string{
+		"Authorization": fmt.Sprintf(`Bearer %s`, auth),
+	}
+
+	return RespondJson(content, url, headers)
 }
 
 // SlashCommandParse will parse the request of the slash command
@@ -99,17 +113,28 @@ func (s SlashCommand) ValidateToken(verificationTokens ...string) bool {
 type GenericReponse map[string]any
 
 type DialogSubmission[T any] struct {
-	Type       string `json:"type"`
+	Type      string `json:"type"`
+	APIAppID  string `json:"api_app_id"`
+	Container struct {
+		Type        string `json:"type"`
+		MessageTs   string `json:"message_ts"`
+		ChannelID   string `json:"channel_id"`
+		IsEphemeral bool   `json:"is_ephemeral"`
+	} `json:"container"`
+	TriggerID  string `json:"trigger_id"`
+	EnterPrise bool   `json:"enterprise"`
 	Submission T      `json:"submission"`
 	CallBackID string `json:"callback_id"`
-	State      string `json:"state"`
+	State      any    `json:"state"`
 	Team       struct {
 		ID     string `json:"id"`
 		Domain string `json:"domain"`
 	} `json:"team"`
 	User struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
+		ID       string `json:"id"`
+		Name     string `json:"name"`
+		Username string `json:"username"`
+		TeamID   string `json:"team_id"`
 	} `json:"user"`
 	Channel struct {
 		ID   string `json:"id"`
@@ -118,6 +143,19 @@ type DialogSubmission[T any] struct {
 	ActionTs    string `json:"action_ts"`
 	Token       string `json:"token"`
 	ResponseUrl string `json:"response_url"`
+	Actions     []struct {
+		ActionID string `json:"action_id"`
+		BlockID  string `json:"block_id"`
+		Value    string `json:"value"`
+		Type     string `json:"type"`
+		ActionTS string `json:"action_ts"`
+		Text     struct {
+			Type  string `json:"type"`
+			Text  string `json:"text"`
+			Emoji bool   `json:"emoji"`
+		} `json:"text"`
+	} `json:"actions"`
+	APPTOKENID string `json:"-"`
 }
 
 func DialogSubmissionParse(r *http.Request) (*DialogSubmission[GenericReponse], error) {

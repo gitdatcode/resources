@@ -61,13 +61,14 @@ func (server *Server) doBotAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	dialogSubmission.APPTOKENID = server.slackToken
+
 	var writer = func(content any) {
 		server.RespondJson(content, http.StatusOK, w)
 	}
 
 	err = commands.ExecuteAction(writer, *dialogSubmission)
 	if err != nil {
-		// msg := fmt.Sprintf(`unable to execute action`)
 		server.HandleError(w, err, `unable to execute action`)
 		return
 	}

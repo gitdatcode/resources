@@ -99,8 +99,12 @@ func (r Resources) Action(resp commands.ResponseWriter, dialogSubmission command
 
 	searchRespFormated := ResourceSearchResponse{}
 	searchRespFormated.FromResourceAdded(*resResp)
-	commands.RespondJson(searchRespFormated, dialogSubmission.ResponseUrl)
-
+	commands.RespondJson(searchRespFormated, dialogSubmission.ResponseUrl, nil)
+	chanPost := ChannelPost{
+		Channel: "resources",
+		Blocks:  searchRespFormated.Blocks,
+	}
+	commands.RespondChannelJson(chanPost, "https://slack.com/api/chat.postMessage", dialogSubmission.APPTOKENID)
 	return nil
 }
 
@@ -157,13 +161,15 @@ func (r Resources) resourceSearch(resp commands.ResponseWriter, slashCommand com
 
 	searchRespFormated := ResourceSearchResponse{}
 	searchRespFormated.FromResourceSearch(slashCommand.Text, *searchResp)
-	commands.RespondJson(searchRespFormated, slashCommand.ResponseURL)
+	commands.RespondJson(searchRespFormated, slashCommand.ResponseURL, nil)
 }
 
 type TextDef struct {
-	Type  string `json:"type,omitempty"`
-	Text  any    `json:"text,omitempty"`
-	Emoji bool   `json:"emoji,omitempty"`
+	Type     string `json:"type,omitempty"`
+	Text     any    `json:"text,omitempty"`
+	Emoji    bool   `json:"emoji,omitempty"`
+	Value    string `json:"value,omitempty"`
+	ActionID string `json:"action_id,omitempty"`
 }
 
 type Block struct {
@@ -172,6 +178,11 @@ type Block struct {
 	Fields    []TextDef `json:"fields,omitempty"`
 	Elements  []TextDef `json:"elements,omitempty"`
 	Accessory *TextDef  `json:"accessory,omitempty"`
+}
+
+type ChannelPost struct {
+	Channel string  `json:"channel"`
+	Blocks  []Block `json:"blocks"`
 }
 
 type ResourceSearchResponse struct {
@@ -191,6 +202,8 @@ func (r *ResourceSearchResponse) AddResource(res types.Resource) {
 				Type: "plain_text",
 				Text: t.Tag,
 			},
+			Value:    fmt.Sprintf(`resource #%s`, t.Tag),
+			ActionID: "resource_search",
 		})
 	}
 
