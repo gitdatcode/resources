@@ -202,8 +202,7 @@ func (r *ResourceSearchResponse) AddResource(res types.Resource) {
 				Type: "plain_text",
 				Text: t.Tag,
 			},
-			Value:    fmt.Sprintf(`resource #%s`, t.Tag),
-			ActionID: "resource_search",
+			Value: fmt.Sprintf(`resource #%s`, t.Tag),
 		})
 	}
 
